@@ -14,7 +14,7 @@ use Drupal\user\Entity\Role;
 */
 class ResetRolesController extends ControllerBase {
 	
-	public function list() {		
+	/*public function list() {		
 		$rolesMultiples = Role::loadMultiple();
 		$roles = [];		
 		foreach ($rolesMultiples as $role) {			
@@ -28,5 +28,5 @@ class ResetRolesController extends ControllerBase {
 			'#theme' => 'list-roles',
 			'#items' => $roles,			
 		);
-	}
+	}*/
 }
