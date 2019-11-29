@@ -96,12 +96,22 @@ class RolesForm extends FormBase {
 		    $mailManager = \Drupal::service('plugin.manager.mail');
 		    $langcode = \Drupal::currentUser()->getPreferredLangcode();
 		    $params['context']['subject'] = "Reset password of " . \Drupal::config('system.site')->get('name');
-		    $params['context']['message'] = "This is a simply email to reset password. Next you have a url to reset password of site <br>: " . user_pass_reset_url($uid) . "";		    
-		    
+		    $params['context']['message'] = "This is a simply email to reset password. Next you have a url to reset password of site: <br> " . user_pass_reset_url($uid) . "";
 		    $to = $uid->getEmail();
-		    $mailManager->mail('system', 'mail', $to, $langcode, $params);
-
+		    $secure_check = $this->sanitize_my_email($to);
+			if ($secure_check != false) {
+			    $mailManager->mail('system', 'mail', $to, $langcode, $params);
+			}
 		}, $users);
 	}
-	
+
+	function sanitize_my_email($field) {
+	    $field = filter_var($field, FILTER_SANITIZE_EMAIL);
+	    if (filter_var($field, FILTER_VALIDATE_EMAIL)) {
+	        return true;
+	    } else {
+	        return false;
+	    }
+	 }
 }
+	
