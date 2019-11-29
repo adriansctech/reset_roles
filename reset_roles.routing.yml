@@ -1,0 +1,7 @@
+reset_roles.list:
+  path: '/reset-roles/list'
+  defaults:    
+    _form: '\Drupal\reset_roles\Form\RolesForm'
+    _title: 'List of roles'
+  requirements:
+    _permission: 'access administration pages'

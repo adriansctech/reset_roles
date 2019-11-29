@@ -1,0 +1,19 @@
+<?php
+
+/**
+ * @file
+ * Contains reset_roles.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_theme().
+ */
+function reset_roles_theme($existing, $type, $theme, $path) {
+  return [
+    'list-roles' => [
+      'variables' => array('items' => array(), 'title' => ''),      
+    ],
+  ];
+}

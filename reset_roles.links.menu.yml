@@ -1,0 +1,6 @@
+reset_roles.list:
+  title: List of roles 
+  description: 'List of roles Page menu link'
+  route_name: reset_roles.list
+  menu_name: main
+  weight: 1
