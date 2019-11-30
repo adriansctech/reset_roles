@@ -1,7 +1,7 @@
 reset_roles.list:
-  title: Reset passwords of users by role 
+  title: Reset passwords 
   description: 'Resets user passwords massively through their role'
-  parent: system.admin_config_system
+  parent: user.admin_index
   route_name: reset_roles.list
   menu_name: main
   weight: 100

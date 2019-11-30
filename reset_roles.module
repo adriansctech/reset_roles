@@ -4,8 +4,6 @@
  * @file
  */
 
-use Drupal\Core\Form\FormStateInterface;
-
 /**
  * @file
  * Contains reset_roles.module.
@@ -22,22 +20,4 @@ function reset_roles_theme($existing, $type, $theme, $path) {
       'template' => 'reset-roles',
     ],
   ];
-}
-
-/**
- * Implements hook_form_FORM_ID_alter() on behalf of reset_roles.module.
- *
- * @see \Drupal\reset_roles\Form\RolesForm method buildForm at /modules/custom/reset_roles/src/Form/RolesForm.php
- */
-function reset_roles_form_reset_roles_form_alter(&$form, FormStateInterface $form_state) {
-
-  //$form['actions'][$action]['#submit'][] = 'reset_roles_form_submit';
-
-}
-
-/**
- *
- */
-function reset_roles_form_submit(&$form, FormStateInterface $form_state) {
-  
 }

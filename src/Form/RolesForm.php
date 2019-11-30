@@ -48,8 +48,7 @@ class RolesForm extends FormBase {
     }
 
     $form['#theme'] = 'reset_roles_form';
-    $form['#attached']['library'][] = 'reset_roles/reset_roles.styles';
-    
+    $form['#attached']['library'][] = 'reset_roles/reset_roles.libraries';
 
     $form['submit'] = [
       '#type' => 'submit',
@@ -92,6 +91,23 @@ class RolesForm extends FormBase {
 
     $this->usersToReset = $this->checkUsers($uids, $checkedRolesNames);
 
+    /*foreach ($this->usersToReset as $user ) {
+    $this->resetPasswrodOfUser($user);
+    $operations[] = ['Drupal\reset_roles\Form\RolesForm::resetPasswrodOfUser', ['resetPasswrodOfUser' => [$user]]];
+    }*/
+
+    /*
+    $batch = array(
+    'title' => t('Send email and force logout'),
+    'operations' => $operations,
+    'finished' => 'All passwords has reset',
+    'init_message' => t('Starting to reset passwords.'),
+    'progress_message' => t('Processed @current out of @total. Estimated time: @estimate.'),
+    'error_message' => t('Something was wrong.'),
+    );
+
+    batch_set($batch);
+     */
     $this->resetPasswordOfUsers($this->usersToReset);
     drupal_set_message(t('Se han encontrado un total de ' . sizeof($this->usersToReset) . ' usuarios.'), 'status');
 
@@ -125,6 +141,35 @@ class RolesForm extends FormBase {
 
     return $users;
 
+  }
+
+  /**
+   *
+   */
+  public function resetPasswrodOfUser($uid) {
+
+    $random = new Random();
+    $mailManager = \Drupal::service('plugin.manager.mail');
+    $langcode = \Drupal::currentUser()->getPreferredLangcode();
+    $params['context']['subject'] = "Reset password of " . \Drupal::config('system.site')->get('name');
+    $params['context']['message'] = "This is a simply email to reset password. Next you have a url to reset password of site: <br> " . user_pass_reset_url($uid) . "";
+    $to = $uid->getEmail();
+    $secure_check = $this->sanitize_my_email($to);
+    if ($secure_check != FALSE) {
+      $user_storage = \Drupal::entityManager()->getStorage('user');
+      $user = $user_storage->load($uid->id());
+      // Reset password of user.
+      $string = $random->string();
+      $uid->setPassword($string);
+      $uid->save();
+      // Logout user inmediatly.
+      \Drupal::currentUser()->setAccount($uid);
+      if (\Drupal::currentUser()->isAuthenticated()) {
+        $session_manager = \Drupal::service('session_manager');
+        $session_manager->delete(\Drupal::currentUser()->id());
+      }
+      $mailManager->mail('system', 'mail', $to, $langcode, $params);
+    }
   }
 
   /**

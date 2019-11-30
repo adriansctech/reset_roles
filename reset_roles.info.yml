@@ -1,11 +1,7 @@
 name: 'Reset Roles'
 description: 'Reset passwords of users by role'
-package: users
-
+configure: admin/config/people/reset-roles/list
 type: module
 core: 8.x
-
-depenencies: 
-  -drupal:users
 
 php: 7.0
