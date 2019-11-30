@@ -47,6 +47,10 @@ class RolesForm extends FormBase {
       }
     }
 
+    $form['#theme'] = 'reset_roles_form';
+    $form['#attached']['library'][] = 'reset_roles/reset_roles.styles';
+    
+
     $form['submit'] = [
       '#type' => 'submit',
       '#value' => $this->t('Reset pasword by role'),

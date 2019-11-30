@@ -1,0 +1,4 @@
+reset_roles.styles:
+  version: 1.x
+  css:    
+    css/main.css: {}

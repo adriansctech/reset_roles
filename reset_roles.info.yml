@@ -1,6 +1,6 @@
 name: 'Reset Roles'
 description: 'Reset passwords of users by role'
-package: 'Custom'
+package: users
 
 type: module
 core: 8.x

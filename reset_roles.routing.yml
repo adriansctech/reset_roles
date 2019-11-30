@@ -1,5 +1,5 @@
 reset_roles.list:
-  path: '/reset-roles/list'
+  path: 'admin/config/people/reset-roles/list'  
   defaults:    
     _form: '\Drupal\reset_roles\Form\RolesForm'
     _title: 'List of roles'
