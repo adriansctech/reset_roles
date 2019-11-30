@@ -1,5 +1,11 @@
 name: 'Reset Roles'
-type: module
 description: 'Reset passwords of users by role'
-core: 8.x
 package: 'Custom'
+
+type: module
+core: 8.x
+
+depenencies: 
+  -drupal:users
+
+php: 7.0

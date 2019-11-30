@@ -13,7 +13,7 @@ class RolesForm extends FormBase {
 	public function __construct() {
 		$roles = [];
 		$rolesMultiples;
-		$UserToReset;
+		$usersToReset;
 	}
 
 	public function getFormId() {
@@ -28,12 +28,14 @@ class RolesForm extends FormBase {
 		$this->rolesMultiples = Role::loadMultiple();
 
 		foreach ($this->rolesMultiples as $role) {			
-			$form[$role->id()] = [
-				'#type' => 'checkbox',
-				'#title' => $role->label(),
-			];
+			if ($role->id() != 'anonymous') {
+				$form[$role->id()] = [
+					'#type' => 'checkbox',
+					'#title' => $role->label(),
+				];	
+			}			
 		}
-		
+			
 		$form['submit'] = [
 			'#type' => 'submit',
 			'#value'=> $this->t('Reset pasword by role'),
@@ -63,21 +65,23 @@ class RolesForm extends FormBase {
 		//Get list of uids of users 
 		$query = \Drupal::entityQuery('user');
 		$uids = $query->execute();
-
+	
 		$this->usersToReset = $this->checkUsers($uids, $checkedRolesNames);
-
-		drupal_set_message(t('Se han encontrado un total de ' . sizeof($this->usersToReset) . ' usuarios.'), 'status');
+		
 		$this->resetPasswordOfUsers($this->usersToReset);
+		drupal_set_message(t('Se han encontrado un total de ' . sizeof($this->usersToReset) . ' usuarios.'), 'status');
+		
 	}
 
 
 
 	public function checkUsers($uids, $roles) {
-
+		
 		$users;
 		$usersGlobals = array_map(function($uid){			
 			return \Drupal\user\Entity\User::load($uid);				
 		}, $uids);		
+
 
 		foreach ($usersGlobals as $key => $user) {			
 			foreach ($roles as $key => $role) {
@@ -91,8 +95,10 @@ class RolesForm extends FormBase {
 		
 	}
 
-	public function resetPasswordOfUsers($users) {		
-		array_map(function($uid){
+	public function resetPasswordOfUsers($users) {
+		$random = new \Drupal\Component\Utility\Random();
+		$string = $random->string();		
+		array_map(function($uid){			
 		    $mailManager = \Drupal::service('plugin.manager.mail');
 		    $langcode = \Drupal::currentUser()->getPreferredLangcode();
 		    $params['context']['subject'] = "Reset password of " . \Drupal::config('system.site')->get('name');
@@ -100,6 +106,10 @@ class RolesForm extends FormBase {
 		    $to = $uid->getEmail();
 		    $secure_check = $this->sanitize_my_email($to);
 			if ($secure_check != false) {
+				$user_storage = \Drupal::entityManager()->getStorage('user');
+				$user = $user_storage->load($uid->id());
+				$uid->setPassword($string);
+				$uid->save();
 			    $mailManager->mail('system', 'mail', $to, $langcode, $params);
 			}
 		}, $users);
