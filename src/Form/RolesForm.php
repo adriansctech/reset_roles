@@ -100,6 +100,9 @@ class RolesForm extends FormBase {
    *   Uids of all users in the system
    * @param $roles
    *   Roles axist in the system
+   *
+   * @return
+   *   $users list of uids of user has roles
    */
   public function checkUsers($uids, $roles) {
 
@@ -159,6 +162,10 @@ class RolesForm extends FormBase {
    *
    * @param $field
    *   field to check
+   *
+   * @return
+   *   TRUE if field is sanitize
+   *   FALSE if field isn't sanitize
    */
   public function sanitize_my_email($field) {
     $field = filter_var($field, FILTER_SANITIZE_EMAIL);
