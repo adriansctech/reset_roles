@@ -9,19 +9,4 @@ use Drupal\Core\Controller\ControllerBase;
  */
 class ResetRolesController extends ControllerBase {
 
-  /*public function list() {
-  $rolesMultiples = Role::loadMultiple();
-  $roles = [];
-  foreach ($rolesMultiples as $role) {
-  $roles[]= [
-  'label' => $role->label(),
-  'id' => $role->id()
-  ];
-  }
-
-  return array(
-  '#theme' => 'list-roles',
-  '#items' => $roles,
-  );
-  }*/
 }

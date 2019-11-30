@@ -9,12 +9,12 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\user\Entity\Role;
 
 /**
- *
+ * Implements a custom form .
  */
 class RolesForm extends FormBase {
 
   /**
-   *
+   * Class constructor.
    */
   public function __construct() {
     $roles = [];
@@ -23,7 +23,7 @@ class RolesForm extends FormBase {
   }
 
   /**
-   *
+   * {@inheritdoc}
    */
   public function getFormId() {
 
@@ -32,7 +32,7 @@ class RolesForm extends FormBase {
   }
 
   /**
-   *
+   * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
 
@@ -56,7 +56,14 @@ class RolesForm extends FormBase {
   }
 
   /**
-   *
+   * {@inheritdoc}
+   */
+  public function validateForm(array &$form, FormStateInterface $form_state) {
+
+  }
+
+  /**
+   * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
 
@@ -87,7 +94,12 @@ class RolesForm extends FormBase {
   }
 
   /**
+   * Check if users has any role.
    *
+   * @param $uids
+   *   Uids of all users in the system
+   * @param $roles
+   *   Roles axist in the system
    */
   public function checkUsers($uids, $roles) {
 
@@ -109,9 +121,13 @@ class RolesForm extends FormBase {
   }
 
   /**
+   * Force reset password of determinated users via email, and force to logout inmediatly.
    *
+   * @param $users
+   *   Array with users objects to reset password
    */
   public function resetPasswordOfUsers($users) {
+
     $random = new Random();
     array_map(function ($uid) use ($random) {
             $mailManager = \Drupal::service('plugin.manager.mail');
@@ -139,7 +155,10 @@ class RolesForm extends FormBase {
   }
 
   /**
+   * To check if any field is secure.
    *
+   * @param $field
+   *   field to check
    */
   public function sanitize_my_email($field) {
     $field = filter_var($field, FILTER_SANITIZE_EMAIL);
