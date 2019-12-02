@@ -37,22 +37,34 @@ class RolesForm extends FormBase {
   public function buildForm(array $form, FormStateInterface $form_state) {
 
     $this->rolesMultiples = Role::loadMultiple();
+    $option = [];
+    $formRolesList = [];
 
     foreach ($this->rolesMultiples as $role) {
       if ($role->id() != 'anonymous') {
-        $form[$role->id()] = [
-          '#type' => 'checkbox',
-          '#title' => $role->label(),
-        ];
+        $formRolesList[$role->id()] = $role->label();
       }
     }
 
+    $form['roles'] = [
+      '#type' => 'radios',
+      '#title' => $this->t('Select the role'),
+      '#default_value' => 0,
+      '#options' => $formRolesList,
+      '#required' => TRUE,
+    ];
+
+    $form['reset'] = [
+      '#type' => 'checkbox',
+      '#title' => t('Expulsar automáticamente de la sesión'),
+      '#description' => t('Si se selecciona esta opción, los usuarios serán expulsados de la sesión actual'),
+    ];
+
     $form['#theme'] = 'reset_roles_form';
-    $form['#attached']['library'][] = 'reset_roles/reset_roles.libraries';
 
     $form['submit'] = [
       '#type' => 'submit',
-      '#value' => $this->t('Reset pasword by role'),
+      '#value' => $this->t('Reiniciar passwords'),
     ];
 
     return $form;
@@ -70,41 +82,31 @@ class RolesForm extends FormBase {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
 
-    $checkedRolesObjects = array_filter(array_filter($form, function ($e) {
-      return $e['#type'] == 'checkbox';
-    }), function ($e) {
-      return $e['#checked'] == 1;
-    });
-
-    $checkedRolesTitles = array_map(function ($value) {
-      return $value['#title'];
-    }, $checkedRolesObjects);
-
-    // Get machine name of roles.
-    $checkedRolesNames = array_map(function ($value) {
-      return $value['#name'];
-    }, $checkedRolesObjects);
+    $roleValue = $form_state->getValues()['roles'];
 
     // Get list of uids of users.
     $query = \Drupal::entityQuery('user');
     $uids = $query->execute();
 
-    $this->usersToReset = $this->checkUsers($uids, $checkedRolesNames);
-
-    foreach ($this->usersToReset as $key => $value) {
-      $operations[] = ['Drupal\reset_roles\Form\RolesForm::sendEmailToReset', ['sendEmailToReset' => $value]];
+    $this->usersToReset = $this->checkUsers($uids, $roleValue);
+    if ($this->usersToReset) {
+      foreach ($this->usersToReset as $key => $value) {
+        $operations[] = ['Drupal\reset_roles\Form\RolesForm::sendEmailToReset', ['sendEmailToReset' => $value]];
+      }
+      $batch = [
+        'title' => t('Send email and force logout'),
+        'operations' => $operations,
+        'finished' => 'All passwords has reset',
+        'init_message' => t('Starting to reset passwords.'),
+        'progress_message' => t('Processed @current out of @total. Estimated time: @estimate.'),
+        'error_message' => t('Something was wrong.'),
+      ];
+      batch_set($batch);
+    }
+    else {
+      drupal_set_message(t('No existe ningún usuario con el rol seleccionado.'), 'warning');
     }
 
-    $batch = [
-      'title' => t('Send email and force logout'),
-      'operations' => $operations,
-      'finished' => 'All passwords has reset',
-      'init_message' => t('Starting to reset passwords.'),
-      'progress_message' => t('Processed @current out of @total. Estimated time: @estimate.'),
-      'error_message' => t('Something was wrong.'),
-    ];
-
-    batch_set($batch);
   }
 
   /**
@@ -112,28 +114,30 @@ class RolesForm extends FormBase {
    *
    * @param $uids
    *   Uids of all users in the system
-   * @param $roles
-   *   Roles axist in the system
+   * @param $role
+   *   Role exist in the system
    *
    * @return
    *   $users list of uids of user has roles
    */
-  public function checkUsers($uids, $roles) {
+  public function checkUsers($uids, $role) {
 
-    $users;
     $usersGlobals = array_map(function ($uid) {
       return User::load($uid);
     }, $uids);
 
-    foreach ($usersGlobals as $key => $user) {
-      foreach ($roles as $key => $role) {
-        if (in_array($role, $user->getRoles())) {
-          $users[] = $user;
-        }
+    foreach ($usersGlobals as $key => $value) {
+      if (in_array($role, $value->getRoles())) {
+        $users[] = $value;
       }
     }
 
-    return $users;
+    if (sizeof($users) > 0) {
+      return $users;
+    }
+    else {
+      return FALSE;
+    }
 
   }
 
