@@ -94,21 +94,18 @@ class RolesForm extends FormBase {
     foreach ($this->usersToReset as $key => $value) {
       $operations[] = ['Drupal\reset_roles\Form\RolesForm::sendEmailToReset', ['sendEmailToReset' => $value]];
     }
-    
-    $batch = array(
+
+    $batch = [
       'title' => t('Send email and force logout'),
       'operations' => $operations,
       'finished' => 'All passwords has reset',
       'init_message' => t('Starting to reset passwords.'),
       'progress_message' => t('Processed @current out of @total. Estimated time: @estimate.'),
       'error_message' => t('Something was wrong.'),
-    );
+    ];
 
-    batch_set($batch);    
+    batch_set($batch);
   }
-
-
-  
 
   /**
    * Check if users has any role.
@@ -140,55 +137,39 @@ class RolesForm extends FormBase {
 
   }
 
-  public function sendEmailToReset ($user) {
+  /**
+   *
+   */
+  public function sendEmailToReset($user) {
     $userObject = user_load($user->id());
     $random = new Random();
     $mailManager = \Drupal::service('plugin.manager.mail');
     $langcode = $userObject->getPreferredLangcode();
     $params['context']['subject'] = "Reset password of " . \Drupal::config('system.site')->get('name');
     $params['context']['message'] = "This is a simply email to reset password. Next you have a url to reset password of site: <br> " . user_pass_reset_url($userObject) . "";
-    $to = $userObject->getEmail();        
-    $mailManager->mail('system', 'mail', $to, $langcode, $params);
-
-
-    /*
-    
-    if ($secure_check != FALSE) {
-      $user_storage = \Drupal::entityManager()->getStorage('user');
-      $user = $user_storage->load($uid->id());
-      // Reset password of user.
-      $string = $random->string();
-      $uid->setPassword($string);
-      $uid->save();
-      // Logout user inmediatly.
-      \Drupal::currentUser()->setAccount($uid);
-      if (\Drupal::currentUser()->isAuthenticated()) {
-        $session_manager = \Drupal::service('session_manager');
-        $session_manager->delete(\Drupal::currentUser()->id());
-      }
+    $to = $userObject->getEmail();
+    $field = filter_var($to, FILTER_SANITIZE_EMAIL);
+    if (filter_var($field, FILTER_VALIDATE_EMAIL)) {
       $mailManager->mail('system', 'mail', $to, $langcode, $params);
     }
-    */    
-  }  
+    /*
 
-  /**
-   * To check if any field is secure.
-   *
-   * @param $field
-   *   field to check
-   *
-   * @return
-   *   TRUE if field is sanitize
-   *   FALSE if field isn't sanitize
-   */
-  public function sanitize_my_email($field) {
-    $field = filter_var($field, FILTER_SANITIZE_EMAIL);
-    if (filter_var($field, FILTER_VALIDATE_EMAIL)) {
-      return TRUE;
+    if ($secure_check != FALSE) {
+    $user_storage = \Drupal::entityManager()->getStorage('user');
+    $user = $user_storage->load($uid->id());
+    // Reset password of user.
+    $string = $random->string();
+    $uid->setPassword($string);
+    $uid->save();
+    // Logout user inmediatly.
+    \Drupal::currentUser()->setAccount($uid);
+    if (\Drupal::currentUser()->isAuthenticated()) {
+    $session_manager = \Drupal::service('session_manager');
+    $session_manager->delete(\Drupal::currentUser()->id());
     }
-    else {
-      return FALSE;
+    $mailManager->mail('system', 'mail', $to, $langcode, $params);
     }
+     */
   }
 
 }
