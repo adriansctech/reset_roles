@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * @file
+ */
+
 use Drupal\Core\Routing\RouteMatchInterface;
 
 /**
@@ -20,8 +24,11 @@ function reset_roles_theme($existing, $type, $theme, $path) {
   ];
 }
 
+/**
+ * Implements hook_help().
+ */
 function reset_roles_help($route_name, RouteMatchInterface $route_match) {
-  switch ($route_name) {    
+  switch ($route_name) {
     case 'help.page.reset_roles':
       return '<p>' . t('A través de este módulo usted, podrá reiniciar la contraseña de un grupo de usuarios definidos por un rol, mediante el envío de un enlace a una url donde el usuario tendrá la posibilidad de cambiar su contraseña actual. También existe la posibilidad de forzar a el usuario que reciba el correo a que utilice este enlace para cambiar su contraseña en el acto, mediante una expulsión inmediata si se encuentra dentro del sistema drupal y la sobreescritura de su contraseña por una random creada en el momento de la ejecución de este módulo.') . '</p>';
   }
