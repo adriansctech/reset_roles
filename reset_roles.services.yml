@@ -1,0 +1,4 @@
+services:
+  reset_roles.custom_services:
+    class: Drupal\reset_roles\Services\ResetRoleService
+    arguments: []
