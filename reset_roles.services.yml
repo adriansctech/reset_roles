@@ -1,4 +1,7 @@
 services:
-  reset_roles.custom_services:
-    class: Drupal\reset_roles\Services\ResetRoleService
-    arguments: []
+  logger.channel.reset_roles:
+    parent: logger.channel_base
+    arguments: ['reset_roles']
+  reset_roles.default:
+    class: Drupal\reset_roles\DefaultService
+    arguments: ['@current_user']

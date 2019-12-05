@@ -1,35 +1,32 @@
 <?php
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\Core\Session\AccountInterface;
+namespace Drupal\reset_roles;
 
-namespace Drupal\reset_roles\Services;
+use Drupal\Core\Session\AccountProxyInterface;
+use Drupal\user\Entity\User;
+use Drupal\Component\Utility\Random;
 
 /**
- * Class CustomService.
+ * Class DefaultService.
  */
-class ResetRoleService {
+class DefaultService {
 
+
+  /**
+   * Drupal\Core\Session\AccountProxyInterface definition.
+   *
+   * @var \Drupal\Core\Session\AccountProxyInterface
+   */
   protected $currentUser;
 
   /**
-   * Constructs a new CustomService object.
+   * Constructs a new DefaultService object.
    */
-  public function __construct(AccountInterface $currentUser) {
-
-    $this->currentUser = $currentUser;
-
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
-    // Instantiates this form class.
-    return new static(
-      // Load the service required to construct this class.
-      $container->get('current_user')
-    );
+  public function __construct(AccountProxyInterface $current_user) {
+    $this->currentUser = $current_user;
+    $roles = [];
+    $rolesMultiples;
+    $usersToReset;
   }
 
   /**
@@ -44,7 +41,6 @@ class ResetRoleService {
    *   $users list of uids of user has roles
    */
   public function checkUsers($uids, $role) {
-
     $usersGlobals = array_map(function ($uid) {
       return User::load($uid);
     }, $uids);
