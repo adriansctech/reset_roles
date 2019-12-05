@@ -2,6 +2,8 @@
 
 namespace Drupal\reset_roles\Form;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\Component\Utility\Random;
 use Drupal\user\Entity\User;
 use Drupal\Core\Form\FormBase;
@@ -13,13 +15,27 @@ use Drupal\user\Entity\Role;
  */
 class RolesForm extends FormBase {
 
+  protected $currentUser;
+
   /**
    * Class constructor.
    */
-  public function __construct() {
+  public function __construct(AccountInterface $currentUser) {
     $roles = [];
     $rolesMultiples;
     $usersToReset;
+    $this->currentUser = $currentUser;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    // Instantiates this form class.
+    return new static(
+      // Load the service required to construct this class.
+      $container->get('current_user')
+    );
   }
 
   /**
@@ -155,10 +171,10 @@ class RolesForm extends FormBase {
    */
   public function logOutUserAndResetPass($user) {
 
-    \Drupal::currentUser()->setAccount($user);
-    if (\Drupal::currentUser()->isAuthenticated()) {
+    $this->currentUser->setAccount($user);
+    if ($this->currentUser->isAuthenticated()) {
       $session_manager = \Drupal::service('session_manager');
-      $session_manager->delete(\Drupal::currentUser()->id());
+      $session_manager->delete($this->currentUser->id());
     }
     $random = new Random();
     $string = $random->string();
